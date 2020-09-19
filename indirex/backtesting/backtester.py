@@ -15,6 +15,7 @@ class CapWeightedBacktester:
         outstanding_shares = pickle.load(open(f'../data/shares_outstanding.pkl', 'rb'))
         self.outstanding = {ticker:outstanding_shares[ticker] for ticker in self.tickers}
         self.rebalance_period = rebalance_period
+        self.spy_pair = []
     
     def get_chart(self):
         """ Runs the backtest and reports metrics """
@@ -22,6 +23,8 @@ class CapWeightedBacktester:
         capital = 100
         shares = {}
         for day, stream_frame in enumerate(self.data_stream.stream_data()):
+            # Update the spy pair
+            self.spy_pair.append(stream_frame['SPY']['Close'])
             # Rebalance if it's time based on opening prices
             if day % self.rebalance_period == 0:
                 market_caps = self.get_market_caps(stream_frame)
@@ -31,12 +34,18 @@ class CapWeightedBacktester:
                     shares[ticker] = (capital * cap_weight) / stream_frame[ticker]['Open']
             # Update the capital we have based on new daily share prices at closing
             capital = 0
-            for ticker, dataframe in stream_frame.items():
-                capital += dataframe['Close'] * shares[ticker]
+            for ticker in self.tickers:
+                capital += stream_frame[ticker]['Close'] * shares[ticker]
             date = stream_frame[self.tickers[0]].name.value/1000000000
             index_price.append((date, capital))
-        print(self.get_wise_investment_amount())
         return index_price
+
+    def get_spy_chart(self):
+        """ Returns the chart for the Spyder S&P 500 index fund over the same period
+        to compare performance of the two
+        ** must finish backtest first ** """
+        return self.spy_pair
+
 
     def get_wise_investment_amount(self):
         """ Given the share prices and market caps of the company, gives an investment
@@ -54,6 +63,6 @@ class CapWeightedBacktester:
     def get_market_caps(self, dict_frame):
         """ Returns a dictionary of the market caps for the tickers for a Multistream data dict """
         caps = {}
-        for ticker, dataframe in dict_frame.items():
-            caps[ticker] = dataframe['Close'] * self.outstanding[ticker]
+        for ticker in self.tickers:
+            caps[ticker] = dict_frame[ticker]['Close'] * self.outstanding[ticker]
         return caps
