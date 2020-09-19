@@ -4,7 +4,7 @@ import time
 import pickle
 
 class AccountManager:
-    """ Monitors the Alpaca.markets account """
+    """ Monitors the Alpaca.markets account pulls account info from hidden """
 
     def __init__(self):
         self.api = tradeapi.REST(APCA_ID, APCA_KEY, APCA_URL, 'v2')
@@ -19,8 +19,24 @@ class AccountManager:
         """ Attempts to rebalance the users portfolio according to the cap weights 
         will cut off any fractional shares rather than optimize """
         try:
+            # Cancel any unfulfilled orders
             self.api.cancel_all_orders()
             time.sleep(60/200)
+            # Sell off shares of any stock not in tickers
+            positions = self.get_open_positions()
+            open_positions = {p[0]:p[1] for p in positions if p[0] not in tickers}
+            for ticker, qty in open_positions.items():
+                self.api.submit_order(
+                        ticker,
+                        qty,
+                        'sell',
+                        'market',
+                        'gtc',
+                )
+                time.sleep(60/200)
+            # Wait till the order resolves
+            while len(self.get_open_orders()) is not 0:
+                time.sleep(.25)
             # Load in the outstanding shares data
             outstanding = pickle.load(open('../data/shares_outstanding.pkl', 'rb'))
             outstanding = {t:outstanding[t] for t in tickers}
@@ -65,3 +81,21 @@ class AccountManager:
                     time.sleep(60/200)
         except Exception as e:
             raise e
+
+    def get_open_orders(self):
+        """ Gets the users open orders from the Alpaca API as Python Lists """
+        orders = []
+        for o in self.api.list_orders():
+            # Symbol, Buy/Sell, Quantity, Number filled, Datetime submitted
+            orders.append([o.symbol, o.side, o.qty, o.filled_qty, o.submitted_at])
+        time.sleep(60/200)
+        return orders
+
+    def get_open_positions(self):
+        """ Gets the users open positions from the Alpaca API as CSV """
+        positions = []
+        for p in self.api.list_positions():
+            # Symbol, Quantity, Profit/Loss, Avg Purchase Price, Avg Share Price, Initial Equity, Current Equity
+            positions.append([p.symbol, p.qty, p.unrealized_plpc, p.avg_entry_price, p.current_price, p.cost_basis, p.market_value])
+        time.sleep(60/200)
+        return positions
