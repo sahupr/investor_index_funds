@@ -6,3 +6,5 @@ A flask application in which you can enter your tickers and rebalancing period w
 
 API used:
 https://www.alphavantage.co - data from previous years for backtesting graphs
+
+Visualization Prototype:  https://jsfiddle.net/aryendersingh/pwnm9s1j/1/
