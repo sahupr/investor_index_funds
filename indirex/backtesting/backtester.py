@@ -4,6 +4,7 @@ import time
 from indirex.backtesting.history_multistream import HistoryMultiStream
 import matplotlib.pyplot as plt
 import pickle
+from os.path import abspath, dirname
 
 class CapWeightedBacktester:
     """ Reports date-aligned, historical performance metrics for a cap-weighted index
@@ -12,7 +13,7 @@ class CapWeightedBacktester:
     def __init__(self, tickers, rebalance_period):
         self.tickers = tickers
         self.data_stream = HistoryMultiStream(self.tickers)
-        outstanding_shares = pickle.load(open(f'../data/shares_outstanding.pkl', 'rb'))
+        outstanding_shares = pickle.load(open(f'{dirname(dirname(abspath(__file__)))}/data/shares_outstanding.pkl', 'rb'))
         self.outstanding = {ticker:outstanding_shares[ticker] for ticker in self.tickers}
         self.rebalance_period = rebalance_period
         self.spy_pair = []

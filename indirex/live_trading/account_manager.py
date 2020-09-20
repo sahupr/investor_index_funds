@@ -2,6 +2,7 @@ import alpaca_trade_api as tradeapi
 from indirex.hidden import APCA_ID, APCA_KEY, APCA_URL
 import time
 import pickle
+from os.path import abspath, dirname
 
 class AccountManager:
     """ Monitors the Alpaca.markets account pulls account info from hidden """
@@ -38,7 +39,7 @@ class AccountManager:
             while len(self.get_open_orders()) is not 0:
                 time.sleep(.25)
             # Load in the outstanding shares data
-            outstanding = pickle.load(open('../data/shares_outstanding.pkl', 'rb'))
+            outstanding = pickle.load(open(f'{dirname(dirname(abspath(__file__)))}/data/shares_outstanding.pkl', 'rb'))
             outstanding = {t:outstanding[t] for t in tickers}
             # Get the total account equity from Alpaca
             total_equity = self.get_portfolio_balance()
