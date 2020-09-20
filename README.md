@@ -4,4 +4,5 @@ This project aims to give you the freedom to create your own index funds by choo
 
 A flask application in which you can enter your tickers and rebalancing period will let you do the backtesting. If you are interested, you can go ahead and place your trade! A frontend application prototype is available inside the package which gets the idea across. A set of backtesting graphs can also be found inside the static/images folder of the project.
 
-APIs used:
+API used:
+https://www.alphavantage.co - data from previous years for backtesting graphs
