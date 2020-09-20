@@ -17,7 +17,7 @@ def download_history():
             data = quandl.get(f'EOD/{ticker}', authtoken=QUANDL_API_KEY)
             data = data.drop(columns=['Open', 'High', 'Low', 'Close', 'Volume', 'Dividend', 'Split'])
             data = data.rename(columns={'Adj_Open': 'Open', 'Adj_High': 'High', 'Adj_Low': 'Low', 'Adj_Close': 'Close', 'Adj_Volume': 'Volume'})
-            pickle.dump(data, open(f'../data/eod_history/{ticker}.pkl', 'wb+'))
+            pickle.dump(data, open(f'data/eod_history/{ticker}.pkl', 'wb+'))
             print(ticker)
         except:
             print(f'Error on ticker {ticker}')
@@ -25,7 +25,7 @@ def download_history():
 
 def record_shares_outstanding():
     """ Uses the list of tickers and records the outstanding shares for each company """
-    outstanding = pickle.load(open(f'../data/shares_outstanding.pkl', 'rb'))
+    outstanding = pickle.load(open(f'data/shares_outstanding.pkl', 'rb'))
     for t in open(f'../data/{sys.argv[2]}').readlines():
         ticker = t.strip()
         try:

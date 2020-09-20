@@ -6,7 +6,7 @@ class HistoryMultiStream:
 
     def __init__(self, tickers):
         self.tickers = tickers
-        self.frames = {t:pickle.load(open(f'../data/eod_history/{t}.pkl', 'rb')) for t in tickers}
+        self.frames = {t:pickle.load(open(f'data/eod_history/{t}.pkl', 'rb')) for t in tickers}
         self.start_date = self.get_youngest()
         self.end_date = self.get_most_recent()
         self.days_data = {}
