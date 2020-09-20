@@ -1,12 +1,13 @@
 import pandas as pd
 import pickle
+from os.path import abspath, dirname
 
 class HistoryMultiStream:
     """ Keeps multiple streams of ticker history in sync with one another and forward fills any missing data"""
 
     def __init__(self, tickers):
-        self.tickers = tickers
-        self.frames = {t:pickle.load(open(f'data/eod_history/{t}.pkl', 'rb')) for t in tickers}
+        self.tickers = tickers + ['SPY']
+        self.frames = {t:pickle.load(open(f'{dirname(dirname(abspath(__file__)))}/data/eod_history/{t}.pkl', 'rb')) for t in self.tickers}
         self.start_date = self.get_youngest()
         self.end_date = self.get_most_recent()
         self.days_data = {}
@@ -47,7 +48,7 @@ class HistoryMultiStream:
                 new_data = True
             except KeyError:
                 pass # There's no data for this date
-        return new_data
+        return new_data and len(self.days_data.keys()) == len(self.tickers)
 
     def stream_data(self):
         """ Generates data since the moment all of the stocks hit the market """

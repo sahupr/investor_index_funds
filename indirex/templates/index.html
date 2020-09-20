@@ -10,7 +10,7 @@
   <h1>INDIREX</h1>
 </div>
 
-<!-- <form action="/" method="POST"> -->
+<form action="/chart" method="POST">
   List stocks: <input id="list_stock" name="list_stock" type="text"><br>
   Rebalance_period: <input id="rebalance" name="rebalance" type="text">
   <!-- <input type="submit" id="stockbtn" value="Go"> -->
@@ -18,12 +18,16 @@
 
 <div>
   <!-- <form action="/chart" method="GET"> -->
-    <button id="stockbtn" name="forwardBtn" type="submit">Get chart</button>
+    <button id="stockbtn" name="forwardBtn" type="submit">Get chart</button><br>
   <!-- </form> -->
 </div>
 
 <div>
-  {% if 'p' in data %}
+  <p id="response"></p>
+</div>
+
+<div>
+  {% if 'p' in chart_data %}
     {{ data['p'] }}
   {% endif %}
 </div>
@@ -38,9 +42,14 @@
         tickers: $('#list_stock').val(),
         Rebalance_period: $('#rebalance').val() 
       }
-      $.post('http://localhost:5000/chart', data, function(data, status){
-        console.log(`${data} and status is ${status}`)
-        // console.log(data)
+      $.post('http://localhost:5000/chart', data, function(data){
+        // console.log(`${data} and status is ${status}`)
+        console.log(data)
+        // $('#response').html(data); 
+
+        // $.each( data, function( key, value ) {
+        //   $('#response').text(value);
+        // })
       })
     })
   })
